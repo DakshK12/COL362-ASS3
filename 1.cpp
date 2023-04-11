@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+/*
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -6,12 +8,14 @@
 #include <sstream>
 #include <algorithm>
 #include <ctime>
+*/
 
+#define MEM_AVLB 1000 //* 1e6
+#define BLOCK_SIZE 128 //* 1e6
 
 using namespace std;
 
-
-int generate_runs(string input_name, int TOTAL_MEM, int key_count) {
+int generate_initial_runs(string input_name, int TOTAL_MEM, int key_count) {
     ifstream input; 
     input.open(input_name.c_str());
 
@@ -101,12 +105,24 @@ int generate_runs(string input_name, int TOTAL_MEM, int key_count) {
     return run_count;
 }
 
+int n_way_merge(int runs_count, int bb)
+{
 
+}
 
 
 int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
+    int runs_count = generate_initial_runs(input, MEM_AVLB, keycount);
 
-    int runs_count = generate_runs(input, 1000, keycount);
+    if (runs_count < MEM_AVLB && runs_count <= k)
+    {
+        n_way_merge(runs_count, 1);
+
+    }
+    else 
+    {
+
+    }
 
     return 0;
 }

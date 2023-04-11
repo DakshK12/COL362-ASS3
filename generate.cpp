@@ -12,6 +12,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
     if (argc != 3) {
+        cout << "expected 3 but " << argc << " args provided" << endl;
         return 0;
     }
 
