@@ -12,128 +12,91 @@ struct HeapNode {
     }
 };
 
-
 int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
     ifstream input; 
     input.open(input_name.c_str());
 
     if (!input.good()) {
-        cout << "File input is not found!" << endl << "Exit program!" << endl;
+        cout << "File input is not found! \n Exit program\n";
         exit(-1);
     }
 
     int local_key_count = 0;
-    // int input_size; 
-    // input.seekg(0, input.end);
-    // input_size = input.tellg();
-    // input.seekg(0, input.beg);
-    // cout << "-------------------------------------------------------\n";
-    // cout << "The size of the file chosen is (in bytes): " << input_size << endl;
-
     int run_count = 0;
     int total_mem_so_far = 0;
 
     ofstream output;
-    vector<string> data; data.clear();
+    vector<string> data; 
 
     cout << "File " << input_name << " is being read!" << "\n";
     cout << "-------------------------------------------------------\n\n\n";
-
     cout << "-------------------------------------------------------\n";
-    while ( (!input.eof()) && (local_key_count < key_count) ) {
-        string sentence;
-        getline(input, sentence);   //jab tak newline encounter na ho , get the string input in sentence 
-        local_key_count ++;
-        int data_sz = 0;
-        if(input.eof()) break;
-        if( sentence == ""){
-            cout << "prblem problem " << local_key_count << "\n";
-        }
 
-        if (total_mem_so_far + sentence.size() < TOTAL_MEM) {
+    string sentence;
+    while (getline(input, sentence) && (local_key_count < key_count)) {
+        local_key_count ++;
+
+        if (total_mem_so_far + sentence.size() + 1 < TOTAL_MEM) {
             total_mem_so_far += sentence.size() + 1; //coz strings are null terminated ig
             data.push_back(sentence);
-            data_sz ++ ;
-
         } else {        //we have obtained a run 
-
-
-
-
 
             auto t1 = std::chrono::high_resolution_clock::now();
             sort(data.begin(), data.end());
-            // radixSort(data);
             auto t2 = std::chrono::high_resolution_clock::now();
             auto t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            printf("sort time measured: %.3f seconds.\n", t3.count() * 1e-9);
-
-
-
-
+            cout << "sort time measured:" << t3.count() * 1e-9 << " seconds.\n";
 
             run_count++;
+
             stringstream ss;
             ss << "temp.0." << run_count;
             cout << "Writing " << ss.str() << endl;
-            output.open(ss.str());
-
-            int data_size = data.size();
+            output.open(ss.str(), ios::out | ios::trunc);
 
             t1 = std::chrono::high_resolution_clock::now();
-
-
-
             ostream_iterator<string> output_iterator(output, "\n");
             copy(begin(data) , end(data)-1 , output_iterator);
-            output << data[data_size-1];
+            output << data.back();
 
             t2 = std::chrono::high_resolution_clock::now();
             t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            printf("write to output file- time measured: %.3f seconds.\n", t3.count() * 1e-9);
+            cout << "write to output file- time measured:" << t3.count() * 1e-9 << " seconds.\n";
 
             //now we have written run i on file run_i.txt 
             output.close();
-            data.clear();
-            total_mem_so_far = sentence.size();
-            data.push_back(sentence);
+            // data.clear();
+            // data.push_back(sentence);
+
+            data.assign(1, sentence);
+            total_mem_so_far = sentence.size() + 1;
         }
     }
 
+    input.close();
+    cout << "Read input is done!" << endl;
+    cout << "-------------------------------------------------------\n\n\n";
 
     if (data.size() > 0) {          //when input file has been finished reading but data vector ko abhi tk kisi run_i.txt file mein unload nhi kiya
         sort(data.begin(), data.end());
+        cout << "data size " << data.size() << "\n";
 
         run_count++;
         stringstream ss;
-        cout << "data size " << data.size() << "\n";
         ss << "temp.0." << run_count;
         cout << "Writing " << ss.str() << "\n";
-        output.open(ss.str());
-
-        int data_size = data.size();
-        // for (int i = 0; i < data_size-1; i++) {
-        //     output << data[i];
-        //     output << endl;
-        // }
+        output.open(ss.str(), ios::out | ios::trunc);
 
         ostream_iterator<string> output_iterator(output, "\n");
         copy(begin(data) , end(data)-1 , output_iterator);
-
-        input.close();
-        output << data[data_size-1];
+        output << data.back();
         output.close();
     }
 
     //now we have all the runs created on disk in txt files 
-    
-    cout << "Read input is done!" << endl;
-//    cout << "Entire process so far took a total of: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " msec." << endl;
-    cout << "-------------------------------------------------------\n\n\n";
 
     return run_count;
 }
-
 
 void merge(int start_idx , int end_idx , int stage , int stage_count , int Total_memory , string outfile , bool outflag ){
 
@@ -245,7 +208,6 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
 
 }
 
-
 int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int totmem , int num_merges_allowed , int num_merges_done ){
     //starting mein i have files = temp.stage.0 to temp.stage.(num_runs-1)
     int start = 0;
@@ -277,9 +239,6 @@ int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int 
     else return (merge_runs(withtin_stage_count -1 , max_fanout , outfile , stage + 1, totmem , num_merges_allowed , num_merges_done)); 
 
 }
-
-
-
 
 int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
 
