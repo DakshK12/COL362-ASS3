@@ -231,21 +231,22 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
 
     cout << "-------------------------------------------------------\n";
     cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
-
+ 
+    string STRING_MAX(2048, 'z');
     bool terminate = false;
     int flag = 0;
     while(!terminate)
     {
-        auto max = max_element(begin(invec) , end(invec));
-        int index = max - begin(invec);
-        if(*max == ""){
+        auto min = min_element(begin(invec) , end(invec));
+        int index = min - begin(invec);
+        if(STRING_MAX.compare(*min) == 0){
             terminate = true;
             break;
         }
 
-        totmem += (*max).size();
-        outvec.push_back(*max);
-        invec[index] = "";
+        totmem += (*min).size();
+        outvec.push_back(*min);
+        invec[index] = STRING_MAX;
 
         if(totmem >= Total_memory){
             if(flag == 0){
