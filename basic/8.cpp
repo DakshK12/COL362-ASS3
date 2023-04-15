@@ -43,8 +43,8 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             auto t1 = std::chrono::high_resolution_clock::now();
             sort(data.begin(), data.end());
             auto t2 = std::chrono::high_resolution_clock::now();
-            auto t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
-            printf("sort time measured: %.3f seconds.\n", t3.count());
+            auto t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
+            cout << "sort time measured:" << t3.count() * 1e-9 <<  "seconds.\n";
 
             run_count++;
 
@@ -59,8 +59,8 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             output << data.back();
 
             t2 = std::chrono::high_resolution_clock::now();
-            t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
-            printf("write to output file- time measured: %.3f seconds.\n", t3.count());
+            t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
+            cout << "write to output file- time measured:" << t3.count()* 1e-9 << "seconds.\n";
 
             //now we have written run i on file run_i.txt 
             output.close();
@@ -202,8 +202,14 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
 
     if(runs_count == 1){
         string ss1 = "temp." + to_string(stage) + "." + to_string(start_idx + 1);
-        string ss2 = "temp." + to_string(stage+1) + "." + to_string(stage_count);
-        rename(ss1.c_str() , ss2.c_str());
+
+        if(outflag){
+            rename(ss1.c_str() , outfile.c_str());
+        }
+        else{
+            string ss2 = "temp." + to_string(stage+1) + "." + to_string(stage_count);
+            rename(ss1.c_str() , ss2.c_str());
+        }
         return;
     }
 
@@ -232,7 +238,7 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
     cout << "-------------------------------------------------------\n";
     cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
  
-    string STRING_MAX(2048, 'z');
+    string STRING_MAX(2048, '~');
     bool terminate = false;
     int flag = 0;
     while(!terminate)
@@ -326,7 +332,7 @@ int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int 
 int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
 
     int runs_count = generate_runs(input, 50000000*2 , keycount); //5*1e7 is 50 mb  
-    int anss = merge_runs(runs_count , k , output , 0 , 50000000*20 , num_merges , 0  );
+    int anss = merge_runs(runs_count , k , output , 0 , 50000000*2 , num_merges , 0  );
 
 
     return anss;
