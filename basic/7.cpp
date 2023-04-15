@@ -44,7 +44,7 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             sort(data.begin(), data.end());
             auto t2 = std::chrono::high_resolution_clock::now();
             auto t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
-            printf("sort time measured: %.3f seconds.\n", t3.count());
+            printf("sort time measured: %.3ld seconds.\n", t3.count());
 
             run_count++;
 
@@ -60,7 +60,7 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
 
             t2 = std::chrono::high_resolution_clock::now();
             t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
-            printf("write to output file- time measured: %.3f seconds.\n", t3.count());
+            printf("write to output file- time measured: %.3ld seconds.\n", t3.count());
 
             //now we have written run i on file run_i.txt 
             output.close();
