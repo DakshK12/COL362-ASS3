@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-#define MEM_AVAIL 900 * 1024 * 1024
+#define MEM_AVAIL 900 * 1000 * 1000
 using namespace std;
 
 struct HeapNode {
@@ -289,8 +289,8 @@ int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int 
 
 }
 
-int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
-    int runs_count = generate_runs(input, MEM_AVAIL , keycount); 
+int external_merge_sort_withstop(const char* input, const char* output, const long key_count , const int k = 2, const int num_merges = 0){
+    int runs_count = generate_runs(input, MEM_AVAIL , key_count); 
     int anss = merge_runs(runs_count , k , output , 0 , MEM_AVAIL , num_merges , 0  );
 
     return anss;
