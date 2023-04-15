@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 
+#define MEM_AVAIL 900 * 1024 * 1024
 using namespace std;
 
 struct HeapNode {
@@ -27,9 +28,9 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
     ofstream output;
     vector<string> data; 
 
-    cout << "File " << input_name << " is being read!" << "\n";
-    cout << "-------------------------------------------------------\n\n\n";
-    cout << "-------------------------------------------------------\n";
+    // cout << "File " << input_name << " is being read!" << "\n";
+    // cout << "-------------------------------------------------------\n\n\n";
+    // cout << "-------------------------------------------------------\n";
 
     string sentence;
     while (getline(input, sentence) && (local_key_count < key_count)) {
@@ -44,13 +45,13 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             sort(data.begin(), data.end());
             auto t2 = std::chrono::high_resolution_clock::now();
             auto t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            cout << "sort time measured:" << t3.count() * 1e-9 <<  "seconds.\n";
+            // cout << "sort time measured:" << t3.count() * 1e-9 <<  "seconds.\n";
 
             run_count++;
 
             stringstream ss;
             ss << "temp.0." << run_count;
-            cout << "Writing " << ss.str() << endl;
+            // cout << "Writing " << ss.str() << endl;
             output.open(ss.str(), ios::out | ios::trunc);
 
             t1 = std::chrono::high_resolution_clock::now();
@@ -60,13 +61,10 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
 
             t2 = std::chrono::high_resolution_clock::now();
             t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            cout << "write to output file- time measured:" << t3.count()* 1e-9 << "seconds.\n";
+            // cout << "write to output file- time measured:" << t3.count()* 1e-9 << "seconds.\n";
 
             //now we have written run i on file run_i.txt 
             output.close();
-            // data.clear();
-            // data.push_back(sentence);
-
             // data.assign(1, sentence);
 
             data = vector<string>(1, sentence);
@@ -75,17 +73,17 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
     }
 
     input.close();
-    cout << "Read input is done!" << endl;
-    cout << "-------------------------------------------------------\n\n\n";
+    // cout << "Read input is done!" << endl;
+    // cout << "-------------------------------------------------------\n\n\n";
 
     if (data.size() > 0) {          //when input file has been finished reading but data vector ko abhi tk kisi run_i.txt file mein unload nhi kiya
         sort(data.begin(), data.end());
-        cout << "data size " << data.size() << "\n";
+        // cout << "data size " << data.size() << "\n";
 
         run_count++;
         stringstream ss;
         ss << "temp.0." << run_count;
-        cout << "Writing " << ss.str() << "\n";
+        // cout << "Writing " << ss.str() << "\n";
         output.open(ss.str(), ios::out | ios::trunc);
 
         ostream_iterator<string> output_iterator(output, "\n");
@@ -129,10 +127,9 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
         }
     }
 
-    cout << "-------------------------------------------------------\n";
-    cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
+    // cout << "-------------------------------------------------------\n";
+    // cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
 
-    // int outcount = 0;
     int flag = 0;
     while (!heap.empty()) {
         string sentence = heap.top().sentence; 
@@ -160,15 +157,9 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
                         totmem = 0;                       
             }
 
-            // outvec.clear();
             // vector<string>().swap(outvec);
             outvec = vector<string>();            
         }
-
-        // if(outcount == 0) output << sentence;
-        // else output << endl << sentence;
-
-        // outcount ++;
         
         if (!input[index].eof()) {
             getline(input[index], sentence);
@@ -185,8 +176,8 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
     outvec = vector<string>();            
 
 
-    cout << "Merge done!" << endl << endl;
-    cout << "-------------------------------------------------------\n\n\n";
+    // cout << "Merge done!" << endl << endl;
+    // cout << "-------------------------------------------------------\n\n\n";
 
     for (int i = 0; i < runs_count; i++) {
         input[i].close();
@@ -235,8 +226,8 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
         }
     }
 
-    cout << "-------------------------------------------------------\n";
-    cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
+    // cout << "-------------------------------------------------------\n";
+    // cout << endl << "Merging from run" << start_idx << " to run" << end_idx << endl;
  
     string STRING_MAX(2048, '~');
     bool terminate = false;
@@ -288,8 +279,8 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
     }
     outvec = vector<string>();
 
-    cout << "Merge done!" << endl << endl;
-    cout << "-------------------------------------------------------\n\n\n";
+    // cout << "Merge done!" << endl << endl;
+    // cout << "-------------------------------------------------------\n\n\n";
 
     for (int i = 0; i < runs_count; i++) {
         input[i].close();
@@ -330,10 +321,8 @@ int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int 
 }
 
 int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
-
-    int runs_count = generate_runs(input, 50000000*2 , keycount); //5*1e7 is 50 mb  
-    int anss = merge_runs(runs_count , k , output , 0 , 50000000*2 , num_merges , 0  );
-
+    int runs_count = generate_runs(input, MEM_AVAIL , keycount); 
+    int anss = merge_runs(runs_count , k , output , 0 , MEM_AVAIL , num_merges , 0  );
 
     return anss;
 }
