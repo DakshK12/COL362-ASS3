@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 
-
 using namespace std;
 
 struct HeapNode {
@@ -44,8 +43,8 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             auto t1 = std::chrono::high_resolution_clock::now();
             sort(data.begin(), data.end());
             auto t2 = std::chrono::high_resolution_clock::now();
-            auto t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            cout << "sort time measured:" << t3.count() * 1e-9 << " seconds.\n";
+            auto t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
+            printf("sort time measured: %.3f seconds.\n", t3.count());
 
             run_count++;
 
@@ -60,15 +59,17 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
             output << data.back();
 
             t2 = std::chrono::high_resolution_clock::now();
-            t3 = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-            cout << "write to output file- time measured:" << t3.count() * 1e-9 << " seconds.\n";
+            t3 = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
+            printf("write to output file- time measured: %.3f seconds.\n", t3.count());
 
             //now we have written run i on file run_i.txt 
             output.close();
             // data.clear();
             // data.push_back(sentence);
 
-            data.assign(1, sentence);
+            // data.assign(1, sentence);
+
+            data = vector<string>(1, sentence);
             total_mem_so_far = sentence.size() + 1;
         }
     }
@@ -92,24 +93,21 @@ int generate_runs(string input_name, long long TOTAL_MEM, int key_count) {
         output << data.back();
         output.close();
     }
+    data = vector<string>();
+
 
     //now we have all the runs created on disk in txt files 
+
     return run_count;
 }
 
 void merge(int start_idx , int end_idx , int stage , int stage_count , int Total_memory , string outfile , bool outflag ){
-    int runs_count = end_idx - start_idx + 1;
 
-    if(runs_count == 1){
-        string ss1 = "temp." + to_string(stage) + "." + to_string(start_idx + 1);
-        string ss2 = "temp." + to_string(stage+1) + "." + to_string(stage_count);
-        rename(ss1.c_str() , ss2.c_str());
-        return;
-    }
+    int runs_count = end_idx - start_idx + 1;
 
     ifstream input[runs_count];
     for (int i = 0; i < runs_count; i++) {
-        input[i].open("temp." + to_string(stage) +  "." + to_string(start_idx + i + 1));
+        input[i].open("temp." + to_string(stage)  + "." + to_string(start_idx + i + 1));
     }
 
     priority_queue<HeapNode, vector<HeapNode> > heap;   //std::vector is our container becoz priority_queue is container adapter
@@ -152,7 +150,6 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
                         copy(begin(outvec) , end(outvec)-1 , output_iterator);
                         output << outvec[outvec.size() - 1];
                         totmem = 0;
-                        outvec.clear();
                         flag = 1;
             }
             else{
@@ -160,9 +157,12 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
                         ostream_iterator<string> output_iterator(output, "\n");
                         copy(begin(outvec) , end(outvec)-1 , output_iterator);
                         output << outvec[outvec.size() - 1];
-                        totmem = 0;
-                        outvec.clear();
+                        totmem = 0;                       
             }
+
+            // outvec.clear();
+            // vector<string>().swap(outvec);
+            outvec = vector<string>();            
         }
 
         // if(outcount == 0) output << sentence;
@@ -182,6 +182,7 @@ void merge(int start_idx , int end_idx , int stage , int stage_count , int Total
         copy(begin(outvec) , end(outvec)-1 , output_iterator);
         output << outvec[outvec.size() - 1];
     }
+    outvec = vector<string>();            
 
 
     cout << "Merge done!" << endl << endl;
@@ -278,7 +279,7 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
         copy(begin(outvec) , end(outvec)-1 , output_iterator);
         output << outvec[outvec.size() - 1];
     }
-
+    outvec = vector<string>();
 
     cout << "Merge done!" << endl << endl;
     cout << "-------------------------------------------------------\n\n\n";
@@ -288,7 +289,6 @@ void merge_noheap(int start_idx , int end_idx , int stage , int stage_count , in
     }
 
     output.close();
-
 }
 
 int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int totmem , int num_merges_allowed , int num_merges_done ){
@@ -310,21 +310,22 @@ int merge_runs(int num_runs , int max_fanout , string outfile , int stage , int 
             if(withtin_stage_count == 1) merge_noheap(start , num_runs - 1 , stage , withtin_stage_count , totmem , outfile , true);
             else merge_noheap(start , num_runs - 1 , stage , withtin_stage_count , totmem , outfile , false);
             num_merges_done ++;
-            if(num_runs - start == 1) num_merges_done --;
             start = num_runs ;
             withtin_stage_count ++ ;
         }
         if(num_merges_allowed == num_merges_done && num_merges_allowed != 0) return num_merges_allowed ;
+
     }
 
     if ( withtin_stage_count == 2 ) return num_merges_done;
     else return (merge_runs(withtin_stage_count -1 , max_fanout , outfile , stage + 1, totmem , num_merges_allowed , num_merges_done)); 
+
 }
 
 int external_merge_sort_withstop(const char* input, const char* output, const long keycount , const int k, const int num_merges){
 
-    int runs_count = generate_runs(input, 50000000*4 , keycount); //5*1e7 is 50 mb  
-    int anss = merge_runs(runs_count , k , output , 0 , 50000000*4 , num_merges , 0  );
+    int runs_count = generate_runs(input, 50000000*2 , keycount); //5*1e7 is 50 mb  
+    int anss = merge_runs(runs_count , k , output , 0 , 50000000*20 , num_merges , 0  );
 
 
     return anss;
