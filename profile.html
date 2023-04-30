@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Profile page</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel="stylesheet" href="../CSS/profile.css">
+
+</head>
+
+<body>
+    
+    <div class="topnav">
+        <a href="{{url_for('profile_page')}}"><i class="fa fa-fw fa-envelope"></i>Profile</a>
+        <a href="{{url_for('logout')}}"><i class="fa fa-fw fa-user"></i> Logout</a>
+    
+    </div>
+
+    <div id="container">
+        <table border="1" align="center" cellpadding="5" cellspacing="5">
+        <tr>
+            <center>
+                <h2>User Homepage</h2>
+            </center>
+            
+        </tr>
+        <tr>
+            <td>
+                <button type="submit" onclick="location.href='new_question'" name="button" value="new_ques_button">Ask new question</button>
+                <button type="submit" onclick="location.href='answer_question'" name="button" value="ans_ques_button">Answer a question</button>
+                <button type="submit" onclick="location.href='search_post'" name="button" value="search_post_button">Search for a post</button>
+            </td>
+        </tr>
+        </table>
+
+    </div>
+
+    <div id = "below">
+        <h2> Your Posts History </h2>
+    </div>
+    <script src="../JS/profile.js"></script>
+
+
+</body>
+</html>
